@@ -2,6 +2,7 @@
 @using DataEntities
 @using Store.Services
 @inject IConfiguration Configuration
+@inject ProductService ProductService
 @rendermode InteractiveServer
 @attribute [StreamRendering(true)]
 
@@ -13,13 +14,39 @@
 
 @if (products == null)
 {
-    <p><em>Loading...</em></p>
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
 }
 else
 {
-    <!--Implement Products table here-->
-    <p>Under construction...</p>
-
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Image</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>
+                        <img
+                            src="@($"{imagePrefix}/{product.ImageUrl}")"
+                            alt="@product.Name"
+                            width="80"
+                            height="80" />
+                    </td>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Price.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 @code {
@@ -31,7 +58,7 @@ else
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);
         imagePrefix = Configuration["ImagePrefix"]!;
-        products = [];
+        products = await ProductService.GetProducts();
     }
 
 }
